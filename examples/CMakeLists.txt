@@ -1,2 +1,2 @@
-add_executable(mmio mmio.cpp)
-target_link_libraries(mmio PRIVATE mmio_lib)
+add_executable(mmio_example mmio.cpp)
+target_link_libraries(mmio_example PRIVATE mmio_lib)
