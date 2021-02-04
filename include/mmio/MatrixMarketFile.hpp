@@ -7,7 +7,6 @@
 
 namespace mmio
 {
-
 /// A class to represent an .mmio file.
 ///
 /// This provides a simple interface to the cardinality of the matrix (number of
@@ -33,9 +32,6 @@ class MatrixMarketFile
   std::ptrdiff_t i_ = 0;                        // byte offset of the first edge
   std::ptrdiff_t e_ = 0;                        // bytes in the mmap-ed file
 
-  /// Find the nth edge in the file.
-  const char* edge(std::ptrdiff_t n) const;
-
  public:
   MatrixMarketFile(std::filesystem::path);
   ~MatrixMarketFile();
@@ -54,6 +50,9 @@ class MatrixMarketFile
   std::int32_t getNEdges() const {
     return nnz_;
   }
+
+  /// Find the nth edge in the file.
+  const char* edge(std::ptrdiff_t n) const;
 
   /// Iterator over edges in the file.
   ///
@@ -138,26 +137,28 @@ class MatrixMarketFile
     edge_iterator<Vs...> begin() const { return begin_; }
     edge_iterator<Vs...>   end() const { return end_; }
   };
-
-  /// Get a subset of edges from the .mmio file.
-  template <class... Vs>
-  friend edge_range<Vs...>
-  edges(const MatrixMarketFile& mm, std::ptrdiff_t j, std::ptrdiff_t k)
-  {
-    return {
-      .begin_ = mm.edge(j),
-      .end_   = mm.edge(k)
-    };
-  }
-
-  /// Get the full range of edges in the .mmio file.
-  template <class... Vs>
-  friend edge_range<Vs...> edges(const MatrixMarketFile& mm)
-  {
-    return {
-      .begin_ = mm.edge(0),
-      .end_   = mm.edge(mm.nnz_)
-    };
-  }
 };
+
+
+/// Get a subset of edges from the .mmio file.
+template <class... Vs>
+inline static MatrixMarketFile::edge_range<Vs...>
+edges(const MatrixMarketFile& mm, std::ptrdiff_t j, std::ptrdiff_t k)
+{
+  return {
+    .begin_ = mm.edge(j),
+    .end_   = mm.edge(k)
+  };
+}
+
+/// Get the full range of edges in the .mmio file.
+template <class... Vs>
+inline static MatrixMarketFile::edge_range<Vs...>
+edges(const MatrixMarketFile& mm)
+{
+  return {
+    .begin_ = mm.edge(0),
+    .end_   = mm.edge(mm.getNEdges())
+  };
+}
 }
