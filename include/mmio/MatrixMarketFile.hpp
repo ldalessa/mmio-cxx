@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
